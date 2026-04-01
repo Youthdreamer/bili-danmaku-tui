@@ -5,7 +5,7 @@
 ## 感谢 blivedm-go
 
 本项目基于 blivedm-go 二次开发。实现简单的弹幕展示功能。非常感谢。  
-[blivedm-go项目地址](https://deepwiki.com/Akegarasu/blivedm-go)
+[blivedm-go项目地址](https://github.com/Akegarasu/blivedm-go)
 
 ## ✨ 功能特性
 
@@ -97,11 +97,13 @@ buvid3=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX; SESSDATA=XXXXXXXXXXXXXXXXXXXXXXXXXX
 项目支持两种方式设置环境变量：
 
 1. **开发环境**：使用 `.env` 文件（推荐）
+
    ```bash
    echo "BLIVE_COOKIE=你的B站Cookie" > .env
    ```
 
 2. **生产环境**：使用终端环境变量
+
    ```bash
    # Linux/macOS
    export BLIVE_COOKIE="你的B站Cookie"
