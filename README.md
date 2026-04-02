@@ -57,7 +57,7 @@ sudo mv bili-danmaku-tui /usr/local/bin/
 1. 创建 `.env` 文件：
 
 ```bash
-echo "BLIVE_COOKIE=你的B站Cookie" > .env
+echo 'BLIVE_COOKIE="你的B站Cookie"' > .env
 ```
 
 2. 运行程序：
