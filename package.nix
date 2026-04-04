@@ -9,7 +9,7 @@ buildGoModule (finalAttrs: {
 
   src = ./.;
 
-  vendorHash = "sha256-F6CxCj9bl48UMGsVekxp0lsIZT7y/Cfpc1wszPefuxY=";
+  vendorHash = "sha256-CdGMkJz2oxrxqiCYtUvms9J9ISekzVo+Aj6WSEPqYuk=";
 
   preBuild =
     if useCnMirror
@@ -25,7 +25,7 @@ buildGoModule (finalAttrs: {
   meta = {
     description = "终端展示bilibili弹幕";
     homepage = "https://github.com/Youthdreamer/bili-danmaku-tui";
-    license = lib.licenses.MIT;
+    license = lib.licenses.mit;
     mainProgram = "bili-danmaku-tui";
   };
 })
