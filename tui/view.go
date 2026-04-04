@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	tea "charm.land/bubbletea/v2"
+	"github.com/mattn/go-runewidth"
 )
 
 // 定义跨平台换行符
@@ -27,46 +28,68 @@ func (m Model) View() tea.View {
 		m.Height = 24
 	}
 
-	// 1. 处理弹幕截断：如果单行太长，显示 >>
-	processedLines := make([]string, len(m.Lines))
-	suffix := " >>"
-	// 预留一些宽度给可能的滚动条或边距（建议减去 2 到 4 个单位）
-	limit := m.Width - len(suffix)
-
-	for i, line := range m.Lines {
-		// 注意：如果包含中文，len(line) 不准确，建议后续使用 utf8.RuneCountInString
-		if len(line) > m.Width {
-			if limit > 0 {
-				processedLines[i] = line[:limit] + suffix
-			} else {
-				processedLines[i] = line[:m.Width]
-			}
-		} else {
-			processedLines[i] = line
-		}
+	wrappedLines := make([]string, 0, len(m.Lines))
+	for _, line := range m.Lines {
+		wrappedLines = append(wrappedLines, wrapLine(line, m.Width)...)
 	}
 
-	// 2. 组合内容
-	danmuku := strings.Join(processedLines, EOL)
-	lineCount := len(processedLines)
+	availableHeight := m.Height - 3
+	if availableHeight < 0 {
+		availableHeight = 0
+	}
 
-	// 3. 重新计算 padding 逻辑
-	// 视觉空 2 行需要 3 个换行符：
-	// 第 1 个换行结束弹幕区，第 2、3 个换行产生两个空行
-	// 所以总占用高度是：lineCount + 2 (空行) + 1 (输入框) = lineCount + 3
-	freeSpace := m.Height - lineCount - 3
+	if len(wrappedLines) > availableHeight {
+		wrappedLines = wrappedLines[len(wrappedLines)-availableHeight:]
+	}
+
+	danmuku := strings.Join(wrappedLines, EOL)
+	lineCount := len(wrappedLines)
+	freeSpace := availableHeight - lineCount
 
 	padding := ""
 	if freeSpace > 0 {
 		padding = strings.Repeat(EOL, freeSpace)
 	}
 
-	// 4. 组装：弹幕 + 填充 + 3个换行符(实现空两行) + 输入框
-	// 这里直接写 3 个 EOL，确保无论 padding 是否存在，间隔都固定
 	separator := EOL + EOL + EOL
 
 	InputView := m.Input.View()
 	v := tea.NewView(danmuku + padding + separator + InputView)
 
 	return v
+}
+
+func wrapLine(line string, width int) []string {
+	if width <= 0 {
+		return nil
+	}
+	if line == "" {
+		return []string{""}
+	}
+
+	lines := make([]string, 0, 1)
+	var builder strings.Builder
+	currentWidth := 0
+
+	for _, r := range line {
+		if r == '\n' {
+			lines = append(lines, builder.String())
+			builder.Reset()
+			currentWidth = 0
+			continue
+		}
+
+		runeWidth := runewidth.RuneWidth(r)
+		if currentWidth+runeWidth > width && builder.Len() > 0 {
+			lines = append(lines, builder.String())
+			builder.Reset()
+			currentWidth = 0
+		}
+
+		builder.WriteRune(r)
+		currentWidth += runeWidth
+	}
+
+	lines = append(lines, builder.String())
+	return lines
 }
