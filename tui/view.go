@@ -1,8 +1,10 @@
 package tui
 
 import (
+	"fmt"
 	"runtime"
 	"strings"
+	"unicode/utf8"
 
 	tea "charm.land/bubbletea/v2"
 	"github.com/mattn/go-runewidth"
@@ -33,10 +35,7 @@ func (m Model) View() tea.View {
 		wrappedLines = append(wrappedLines, wrapLine(line, m.Width)...)
 	}
 
-	availableHeight := m.Height - 3
-	if availableHeight < 0 {
-		availableHeight = 0
-	}
+	availableHeight := max(0, m.Height-3)
 
 	if len(wrappedLines) > availableHeight {
 		wrappedLines = wrappedLines[len(wrappedLines)-availableHeight:]
@@ -52,9 +51,29 @@ func (m Model) View() tea.View {
 	}
 
 	separator := EOL + EOL + EOL
+	inputView := m.Input.View()
+	currentLen := utf8.RuneCountInString(m.Input.Value())
+	counterStr := fmt.Sprintf(" [%d/%d]", currentLen, maxLen)
+	counterWidth := runewidth.StringWidth(counterStr)
 
-	InputView := m.Input.View()
-	v := tea.NewView(danmuku + padding + separator + InputView)
+	// 2. 动态位置逻辑：计算留给输入框的“安全空间”
+	// 假设我们希望输入框至少能显示 10 个字符宽
+	const minInputSpace = 10
+
+	finalInputRow := ""
+	if m.Width-counterWidth < minInputSpace {
+		// 空间太窄了，隐藏计数器，只显示输入框
+		// 并使用 runewidth.Truncate 确保输入框不会超出屏幕总宽
+		finalInputRow = runewidth.Truncate(inputView, m.Width, "")
+	} else {
+		// 空间充足，左右拼接
+		// 同样对 inputView 进行截断，确保它 + 计数器不会溢出
+		availableInputWidth := m.Width - counterWidth
+		truncatedInput := runewidth.Truncate(inputView, availableInputWidth, "")
+		finalInputRow = truncatedInput + counterStr
+	}
+
+	v := tea.NewView(danmuku + padding + separator + finalInputRow)
 
 	return v
 }

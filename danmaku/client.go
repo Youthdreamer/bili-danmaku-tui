@@ -2,15 +2,14 @@ package danmaku
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/Akegarasu/blivedm-go/client"
 	"github.com/Akegarasu/blivedm-go/message"
 )
 
-func Start(roomID string, cookie string, onMsg func(string)) error {
-	id, _ := strconv.Atoi(roomID)
-	c := client.NewClient(id)
+func Start(roomID int, cookie string, onMsg func(string)) (err error) {
+
+	c := client.NewClient(roomID)
 	if cookie == "" {
 		fmt.Println("⚠️ 未设置 BLIVE_COOKIE，将使用匿名模式")
 	} else {
@@ -18,9 +17,9 @@ func Start(roomID string, cookie string, onMsg func(string)) error {
 	}
 
 	c.OnDanmaku(func(d *message.Danmaku) {
-		text := fmt.Sprintf("[%s] %s", d.Sender.Uname, d.Content)
+		text := fmt.Sprintf("-> [%s] %s", d.Sender.Uname, d.Content)
 
-		// 👉 把弹幕发给 TUI
+		// 把弹幕发给 TUI
 		onMsg(text)
 	})
 

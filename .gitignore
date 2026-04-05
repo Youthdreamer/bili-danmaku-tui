@@ -4,8 +4,3 @@ bili-danmaku
 bili-danmaku-tui
 bili-danmaku-tui-*/
 result
-.cache/
-pkg/
-src/
-*.pkg.tar.zst
-*.pkg.tar.zst.sig
