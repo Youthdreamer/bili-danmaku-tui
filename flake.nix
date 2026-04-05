@@ -34,12 +34,7 @@
       }: rec {
         default = pkgs.buildGoModule rec {
           pname = "bili-danmaku-tui";
-          version =
-            if (self ? tag)
-            then self.tag
-            else if (self ? shortRev)
-            then "v0.0.0-${self.shortRev}"
-            else "v0.0.0-dirty";
+          version = "v0.1.4";
 
           src = ./.;
 
