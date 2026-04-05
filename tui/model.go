@@ -10,6 +10,7 @@ type Model struct {
 	Lines         []string
 	RoomID        string
 	Cookie        string
+	welcomeMsg    string
 }
 
 func NewModel(roomID, cookie string) Model {

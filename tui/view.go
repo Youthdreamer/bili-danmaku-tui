@@ -18,10 +18,6 @@ var EOL = func() string {
 	return "\n"
 }()
 
-func (m Model) Init() tea.Cmd {
-	return tea.ClearScreen
-}
-
 func (m Model) View() tea.View {
 	if m.Width == 0 {
 		m.Width = 80
@@ -50,31 +46,23 @@ func (m Model) View() tea.View {
 		padding = strings.Repeat(EOL, freeSpace)
 	}
 
-	separator := EOL + EOL + EOL
 	inputView := m.Input.View()
 	currentLen := utf8.RuneCountInString(m.Input.Value())
 	counterStr := fmt.Sprintf(" [%d/%d]", currentLen, maxLen)
-	counterWidth := runewidth.StringWidth(counterStr)
 
 	// 2. 动态位置逻辑：计算留给输入框的“安全空间”
 	// 假设我们希望输入框至少能显示 10 个字符宽
 	const minInputSpace = 10
 
-	finalInputRow := ""
-	if m.Width-counterWidth < minInputSpace {
-		// 空间太窄了，隐藏计数器，只显示输入框
-		// 并使用 runewidth.Truncate 确保输入框不会超出屏幕总宽
-		finalInputRow = runewidth.Truncate(inputView, m.Width, "")
+	indent := m.Width - runewidth.StringWidth(counterStr)
+	hintLine := ""
+	if indent > 0 {
+		hintLine = strings.Repeat(" ", max(0, indent)) + counterStr
 	} else {
-		// 空间充足，左右拼接
-		// 同样对 inputView 进行截断，确保它 + 计数器不会溢出
-		availableInputWidth := m.Width - counterWidth
-		truncatedInput := runewidth.Truncate(inputView, availableInputWidth, "")
-		finalInputRow = truncatedInput + counterStr
+		hintLine = counterStr
 	}
 
-	v := tea.NewView(danmuku + padding + separator + finalInputRow)
-
+	v := tea.NewView(m.welcomeMsg + danmuku + padding + EOL + hintLine + EOL + inputView)
 	return v
 }
 
