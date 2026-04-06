@@ -62,7 +62,7 @@ func (m Model) View() tea.View {
 		hintLine = counterStr
 	}
 
-	v := tea.NewView(m.welcomeMsg + danmuku + padding + EOL + hintLine + EOL + inputView)
+	v := tea.NewView(danmuku + padding + EOL + hintLine + EOL + inputView)
 	return v
 }
 

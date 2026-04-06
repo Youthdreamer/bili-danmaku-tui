@@ -4,15 +4,28 @@ import (
 	"unicode/utf8"
 
 	tea "charm.land/bubbletea/v2"
+	"github.com/Youthdreamer/bili-danmaku-tui/config"
 	"github.com/Youthdreamer/bili-danmaku-tui/danmaku"
 )
 
 type InitMsg string
 
 func (m Model) Init() tea.Cmd {
+	var cookieMissingHint string // 声明变量
+	cookie := config.Load()
+	if cookie == "" {
+		cookieMissingHint = "⚠️ 未设置 blive_cookie，将使用匿名模式"
+	}
 	return tea.Sequence(
 		func() tea.Msg { return tea.ClearScreen() },
-		func() tea.Msg { return InitMsg("欢迎使用 Bilibili 弹幕助手！\n") },
+		func() tea.Msg { return DanmakuMsg("\n") },
+		func() tea.Msg { return DanmakuMsg("欢迎使用 Bilibili 弹幕助手！\n") },
+		func() tea.Msg {
+			if cookieMissingHint != "" {
+				return DanmakuMsg(cookieMissingHint + "\n")
+			}
+			return nil
+		},
 	)
 }
 
@@ -33,9 +46,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
-	case InitMsg:
-		// 处理欢迎消息，可以保存到 model 中
-		m.welcomeMsg = string(msg)
 
 	case tea.KeyPressMsg:
 		switch msg.Code {
