@@ -22,10 +22,32 @@ jobs:
           go-version: '1.25.6'
       - name: Build and Package
         run: |
-          # 只需要告诉 Makefile 架构，它会处理剩下的事情
+          # 确保 dist 目录存在并清理旧文件
+          mkdir -p dist
           make release GOOS=linux GOARCH=${{ matrix.goarch }}
-      - name: Upload Release
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.goarch }}
+          # 明确指定上传的文件，避免把整个目录结构带进去
+          path: dist/*.tar.gz
+          retention-days: 1
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: binaries-*
+          merge-multiple: true
+          # 建议下载到一个统一的目录，方便后面引用
+          path: release-artifacts
+      - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/*.tar.gz
+          # 这里的路径要和上面 download 的 path 对应
+          files: release-artifacts/*.tar.gz
           generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

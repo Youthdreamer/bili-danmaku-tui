@@ -1,5 +1,6 @@
 .env
 
+dist
 bili-danmaku
 bili-danmaku-tui
 bili-danmaku-tui-*/
