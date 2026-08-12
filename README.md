@@ -126,7 +126,7 @@ buvid3=XXXXXXXX;SESSDATA=XXXXXXXXX;bili_jct=XXXXXXX
 导入环境变量`BLIVE_COOKIE`(以`zsh`为例)
 
 ```bash
-export BLIVE_COOKE="buvid3=XXXXXXXX;SESSDATA=XXXXXXXXX;bili_jct=XXXXXXX"
+export BLIVE_COOKIE="buvid3=XXXXXXXX;SESSDATA=XXXXXXXXX;bili_jct=XXXXXXX"
 ```
 
 之后可在任何位置使用以下命令查看弹幕与发送弹幕
